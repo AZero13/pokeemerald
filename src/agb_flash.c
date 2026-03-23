@@ -70,7 +70,7 @@ void FlashTimerIntr(void)
 
 u16 SetFlashTimerIntr(u8 timerNum, void (**intrFunc)(void))
 {
-    if (timerNum >= 4)
+    if (timerNum > 3)
         return 1;
 
     sTimerNum = timerNum;
@@ -113,18 +113,13 @@ void SetReadFlash1(u16 *dest)
     u16 *src;
     u16 i;
 
-    PollFlashStatus = (u8 (*)(u8 *))((s32)dest + 1);
+    PollFlashStatus = (u8 (*)(u8 *))((u8 *)dest + 1);
 
     src = (u16 *)ReadFlash1;
-    src = (u16 *)((s32)src ^ 1);
+    src = (u16 *)((u32)src & ~1);
 
-    i = ((s32)SetReadFlash1 - (s32)ReadFlash1) >> 1;
-
-    while (i != 0)
-    {
-        *dest++ = *src++;
-        i--;
-    }
+    for(i=((u32)SetReadFlash1-(u32)ReadFlash1)>>1;i>0;i--)
+		*dest++=*src++;
 }
 
 // Using volatile here to make sure the flash memory will ONLY be read as bytes, to prevent any compiler optimizations.
@@ -154,18 +149,13 @@ void ReadFlash(u16 sectorNum, u32 offset, u8 *dest, u32 size)
     }
 
     funcSrc = (vu16 *)ReadFlash_Core;
-    funcSrc = (vu16 *)((s32)funcSrc ^ 1);
+    funcSrc = (vu16 *)((u32)funcSrc & ~1);
     funcDest = readFlash_Core_Buffer;
 
-    i = ((s32)ReadFlash - (s32)ReadFlash_Core) >> 1;
+    for(i=((u32)ReadFlash-(u32)ReadFlash_Core)>>1;i>0;i--)
+		*funcDest++=*funcSrc++;
 
-    while (i != 0)
-    {
-        *funcDest++ = *funcSrc++;
-        i--;
-    }
-
-    readFlash_Core = (void (*)(vu8 *, u8 *, u32))((s32)readFlash_Core_Buffer + 1);
+    readFlash_Core = (void (*)(vu8 *, u8 *, u32))((u8*)readFlash_Core_Buffer + 1);
 
     src = FLASH_BASE + (sectorNum << gFlash->sector.shift) + offset;
 
@@ -187,7 +177,7 @@ u32 VerifyFlashSector(u16 sectorNum, u8 *src)
 {
     u16 i;
     vu16 verifyFlashSector_Core_Buffer[0x80];
-    vu16 *funcSrc;
+    const vu16 *funcSrc;
     vu16 *funcDest;
     u8 *tgt;
     u16 size;
@@ -201,31 +191,25 @@ u32 VerifyFlashSector(u16 sectorNum, u8 *src)
         sectorNum %= SECTORS_PER_BANK;
     }
 
-    funcSrc = (vu16 *)VerifyFlashSector_Core;
-    funcSrc = (vu16 *)((s32)funcSrc ^ 1);
+    funcSrc = (const vu16 *)VerifyFlashSector_Core;
+    funcSrc = (const vu16 *)((u32)funcSrc & ~1u);
     funcDest = verifyFlashSector_Core_Buffer;
 
-    i = ((s32)VerifyFlashSector - (s32)VerifyFlashSector_Core) >> 1;
-
-    while (i != 0)
-    {
+    for (i = ((u32)VerifyFlashSector - (u32)VerifyFlashSector_Core) >> 1; i > 0; i--)
         *funcDest++ = *funcSrc++;
-        i--;
-    }
 
-    verifyFlashSector_Core = (u32 (*)(u8 *, u8 *, u32))((s32)verifyFlashSector_Core_Buffer + 1);
+    verifyFlashSector_Core = (u32 (*)(u8 *, u8 *, u32))((u8 *)verifyFlashSector_Core_Buffer + 1);
 
     tgt = FLASH_BASE + (sectorNum << gFlash->sector.shift);
     size = gFlash->sector.size;
-
     return verifyFlashSector_Core(src, tgt, size);
 }
 
 u32 VerifyFlashSectorNBytes(u16 sectorNum, u8 *src, u32 n)
 {
     u16 i;
-    vu16 verifyFlashSector_Core_Buffer[0x80];
-    vu16 *funcSrc;
+    u16 verifyFlashSector_Core_Buffer[0x80];
+    const vu16 *funcSrc;
     vu16 *funcDest;
     u8 *tgt;
     u32 (*verifyFlashSector_Core)(u8 *, u8 *, u32);
@@ -238,19 +222,14 @@ u32 VerifyFlashSectorNBytes(u16 sectorNum, u8 *src, u32 n)
 
     REG_WAITCNT = (REG_WAITCNT & ~WAITCNT_SRAM_MASK) | WAITCNT_SRAM_8;
 
-    funcSrc = (vu16 *)VerifyFlashSector_Core;
-    funcSrc = (vu16 *)((s32)funcSrc ^ 1);
+    funcSrc = (const vu16 *)VerifyFlashSector_Core;
+    funcSrc = (const vu16 *)((u32)funcSrc & ~1);
     funcDest = verifyFlashSector_Core_Buffer;
 
-    i = ((s32)VerifyFlashSector - (s32)VerifyFlashSector_Core) >> 1;
-
-    while (i != 0)
-    {
+    for (i = ((u32)VerifyFlashSectorNBytes - (u32)VerifyFlashSector_Core) >> 1; i > 0; i--)
         *funcDest++ = *funcSrc++;
-        i--;
-    }
 
-    verifyFlashSector_Core = (u32 (*)(u8 *, u8 *, u32))((s32)verifyFlashSector_Core_Buffer + 1);
+    verifyFlashSector_Core = (u32 (*)(u8 *, u8 *, u32))((u8 *)verifyFlashSector_Core_Buffer + 1);
 
     tgt = FLASH_BASE + (sectorNum << gFlash->sector.shift);
 
