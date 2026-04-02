@@ -423,6 +423,7 @@ const struct SpriteTemplate gPsychoBoostOrbSpriteTemplate =
 static void AnimDefensiveWall(struct Sprite *sprite)
 {
     u8 isContest = IsContest();
+    u8 battler, rank, toBG_2;
 
     if (GetBattlerSide(gBattleAnimAttacker) == B_SIDE_PLAYER || isContest)
     {
@@ -432,18 +433,17 @@ static void AnimDefensiveWall(struct Sprite *sprite)
 
     if (!isContest)
     {
-        u8 battlerCopy;
-        u8 battler = battlerCopy = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT);
-        u8 rank = GetBattlerSpriteBGPriorityRank(battler);
-        int var0 = 1;
-        u8 toBG_2 = (rank ^ var0) != 0;
+        battler = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT);
+        if(GetBattlerSpriteBGPriorityRank(battler) == 1)
+            toBG_2 = FALSE;
+        else
+            toBG_2 = TRUE;
 
         if (IsBattlerSpriteVisible(battler))
             MoveBattlerSpriteToBG(battler, toBG_2, FALSE);
 
-        battler = BATTLE_PARTNER(battlerCopy);
-        if (IsBattlerSpriteVisible(battler))
-            MoveBattlerSpriteToBG(battler, toBG_2 ^ var0, FALSE);
+        if (IsBattlerSpriteVisible(BATTLE_PARTNER(battler)))
+            MoveBattlerSpriteToBG(BATTLE_PARTNER(battler), toBG_2 ^ 1, FALSE);
     }
 
     if (!isContest && IsDoubleBattle())
@@ -537,19 +537,16 @@ static void AnimDefensiveWall_Step4(struct Sprite *sprite)
 {
     SetGpuReg(REG_OFFSET_BLDALPHA, BLDALPHA_BLEND(sprite->data[3], 16 - sprite->data[3]));
 
-    if (--sprite->data[3] == -1)
+    if (sprite->data[3]-- == 0)
     {
         if (!IsContest())
         {
-            u8 battlerCopy;
-            u8 battler = battlerCopy = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT);
-
+            u8 battler = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT);
             if (IsBattlerSpriteVisible(battler))
                 gSprites[gBattlerSpriteIds[battler]].invisible = FALSE;
 
-            battler = BATTLE_PARTNER(battlerCopy);
-            if (IsBattlerSpriteVisible(battler))
-                gSprites[gBattlerSpriteIds[battler]].invisible = FALSE;
+            if (IsBattlerSpriteVisible(BATTLE_PARTNER(battler)))
+                gSprites[gBattlerSpriteIds[BATTLE_PARTNER(battler)]].invisible = FALSE;
         }
 
         sprite->invisible = TRUE;
@@ -561,18 +558,19 @@ static void AnimDefensiveWall_Step5(struct Sprite *sprite)
 {
     if (!IsContest())
     {
-        u8 battlerCopy;
-        u8 battler = battlerCopy = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT);
-        u8 rank = GetBattlerSpriteBGPriorityRank(battler);
-        int var0 = 1;
-        bool8 toBG2 = (rank ^ var0) != 0;
+        u8 battler, toBG2;
+
+        battler = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT);
+        if(GetBattlerSpriteBGPriorityRank(battler) == 1)
+            toBG2 = FALSE;
+        else
+            toBG2 = TRUE;
 
         if (IsBattlerSpriteVisible(battler))
             ResetBattleAnimBg(toBG2);
 
-        battler = BATTLE_PARTNER(battlerCopy);
-        if (IsBattlerSpriteVisible(battler))
-            ResetBattleAnimBg(toBG2 ^ var0);
+        if (IsBattlerSpriteVisible(BATTLE_PARTNER(battler)))
+            ResetBattleAnimBg(toBG2 ^ 1);
     }
 
     sprite->callback = DestroyAnimSprite;
@@ -583,10 +581,11 @@ static void AnimWallSparkle(struct Sprite *sprite)
 {
     if (sprite->data[0] == 0)
     {
-        bool32 ignoreOffsets = gBattleAnimArgs[3];
-        bool8 respectMonPicOffsets = FALSE;
-        if (!ignoreOffsets)
+        bool8 respectMonPicOffsets;
+        if (!gBattleAnimArgs[3])
             respectMonPicOffsets = TRUE;
+        else
+            respectMonPicOffsets = FALSE;
 
         if (!IsContest() && IsDoubleBattle())
         {
@@ -683,7 +682,7 @@ static void AnimQuestionMark_Step2(struct Sprite *sprite)
         }
         break;
     case 1:
-        if (--sprite->data[1] == -1)
+        if (sprite->data[1]-- == 0)
             DestroyAnimSprite(sprite);
         break;
     }
@@ -692,9 +691,8 @@ static void AnimQuestionMark_Step2(struct Sprite *sprite)
 void AnimTask_MeditateStretchAttacker(u8 taskId)
 {
     struct Task *task = &gTasks[taskId];
-    u8 spriteId = GetAnimBattlerSpriteId(ANIM_ATTACKER);
-    task->data[0] = spriteId;
-    PrepareAffineAnimInTaskData(task, spriteId, sAffineAnim_MeditateStretchAttacker);
+    task->data[0] = GetAnimBattlerSpriteId(ANIM_ATTACKER);
+    PrepareAffineAnimInTaskData(task, task->data[0], sAffineAnim_MeditateStretchAttacker);
     task->func = AnimTask_MeditateStretchAttacker_Step;
 }
 
@@ -707,8 +705,7 @@ static void AnimTask_MeditateStretchAttacker_Step(u8 taskId)
 void AnimTask_Teleport(u8 taskId)
 {
     struct Task *task = &gTasks[taskId];
-    u8 spriteId = GetAnimBattlerSpriteId(ANIM_ATTACKER);
-    task->data[0] = spriteId;
+    task->data[0] = GetAnimBattlerSpriteId(ANIM_ATTACKER);
     task->data[1] = 0;
     task->data[2] = 0;
     task->data[3] = GetBattlerSide(gBattleAnimAttacker) != B_SIDE_PLAYER ? 4 : 8;
@@ -954,12 +951,10 @@ static void AnimSkillSwapOrb(struct Sprite *sprite)
 void AnimTask_ExtrasensoryDistortion(u8 taskId)
 {
     s16 i;
-    u8 yOffset;
     struct ScanlineEffectParams scanlineParams;
     struct Task *task = &gTasks[taskId];
 
-    yOffset = GetBattlerYCoordWithElevation(gBattleAnimTarget);
-    task->data[14] = yOffset - 32;
+    task->data[14] = GetBattlerYCoordWithElevation(gBattleAnimTarget) - 32;
 
     switch (gBattleAnimArgs[0])
     {
@@ -967,19 +962,19 @@ void AnimTask_ExtrasensoryDistortion(u8 taskId)
         task->data[11] = 2;
         task->data[12] = 5;
         task->data[13] = 64;
-        task->data[15] = yOffset + 32;
+        task->data[15] = task->data[14] + 64;
         break;
     case 1:
         task->data[11] = 2;
         task->data[12] = 5;
         task->data[13] = 192;
-        task->data[15] = yOffset + 32;
+        task->data[15] = task->data[14] + 64;
         break;
     case 2:
         task->data[11] = 4;
         task->data[12] = 4;
         task->data[13] = 0;
-        task->data[15] = yOffset + 32;
+        task->data[15] = task->data[14] + 64;
         break;
     }
 
