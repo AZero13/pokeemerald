@@ -33,3 +33,12 @@ keysplit tuba, 24
 keysplit french_horn, 36
 	split 0, 66
 	split 1, 108
+
+keysplit title_ep, 33
+	split 0, 71
+	split 1, 108
+
+keysplit title_lead, 52
+	split 0, 59
+	split 1, 71
+	split 2, 108

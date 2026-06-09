@@ -5,7 +5,6 @@
 .include "sound/voicegroups/drumsets/frlg.inc"
 .include "sound/voicegroups/drumsets/emerald_1.inc"
 .include "sound/voicegroups/drumsets/emerald_2.inc"
-
 @ key splits
 .include "sound/voicegroups/keysplits/piano.inc"
 .include "sound/voicegroups/keysplits/strings.inc"
@@ -13,6 +12,8 @@
 .include "sound/voicegroups/unused.inc"
 .include "sound/voicegroups/keysplits/tuba.inc"
 .include "sound/voicegroups/keysplits/french_horn.inc"
+.include "sound/voicegroups/keysplits/title_ep.inc"
+.include "sound/voicegroups/keysplits/title_lead.inc"
 
 .include "sound/voicegroups/route110.inc"
 .include "sound/voicegroups/route101.inc"
