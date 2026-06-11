@@ -37,7 +37,7 @@ struct PokenavListWindowState {
     void *listPtr;
 };
 
-struct PokenavListSub
+struct PokenavListView
 {
     struct PokenavListMenuWindow listWindow;
     u32 printStart;
@@ -60,30 +60,30 @@ struct PokenavListSub
 
 struct PokenavList
 {
-    struct PokenavListSub sub;
+    struct PokenavListView view;
     struct PokenavListWindowState windowState;
     s32 eraseIndex;
     u32 loopedTaskId;
 };
 
-static void InitPokenavListBg(struct PokenavListSub *);
-static bool32 CopyPokenavListMenuTemplate(struct PokenavListSub *, const struct BgTemplate *, struct PokenavListTemplate *, s32);
+static void InitPokenavListBg(struct PokenavListView *);
+static bool32 CopyPokenavListMenuTemplate(struct PokenavListView *, const struct BgTemplate *, struct PokenavListTemplate *, s32);
 static void InitPokenavListWindowState(struct PokenavListWindowState *, struct PokenavListTemplate *);
 static void SpriteCB_UpArrow(struct Sprite *);
 static void SpriteCB_DownArrow(struct Sprite *);
 static void SpriteCB_RightArrow(struct Sprite *);
-static void ToggleListArrows(struct PokenavListSub *, bool32);
-static void DestroyListArrows(struct PokenavListSub *);
-static void CreateListArrowSprites(struct PokenavListWindowState *, struct PokenavListSub *);
+static void ToggleListArrows(struct PokenavListView *, bool32);
+static void DestroyListArrows(struct PokenavListView *);
+static void CreateListArrowSprites(struct PokenavListWindowState *, struct PokenavListView *);
 static void LoadListArrowGfx(void);
-static void PrintMatchCallFlavorText(struct PokenavListWindowState *, struct PokenavListSub *, u32);
-static void PrintMatchCallFieldNames(struct PokenavListSub *, u32);
-static void PrintMatchCallListTrainerName(struct PokenavListWindowState *, struct PokenavListSub *);
-static void PrintCheckPageTrainerName(struct PokenavListWindowState *, struct PokenavListSub *);
+static void PrintMatchCallFlavorText(struct PokenavListWindowState *, struct PokenavListView *, u32);
+static void PrintMatchCallFieldNames(struct PokenavListView *, u32);
+static void PrintMatchCallListTrainerName(struct PokenavListWindowState *, struct PokenavListView *);
+static void PrintCheckPageTrainerName(struct PokenavListWindowState *, struct PokenavListView *);
 static void EraseListEntry(struct PokenavListMenuWindow *, s32, s32);
-static void CreateMoveListWindowTask(s32, struct PokenavListSub *);
-static void PrintListItems(void *, u32, u32, u32, u32, struct PokenavListSub *);
-static void InitListItems(struct PokenavListWindowState *, struct PokenavListSub *);
+static void CreateMoveListWindowTask(s32, struct PokenavListView *);
+static void PrintListItems(void *, u32, u32, u32, u32, struct PokenavListView *);
+static void InitListItems(struct PokenavListWindowState *, struct PokenavListView *);
 static void InitPokenavListWindow(struct PokenavListMenuWindow *);
 static u32 LoopedTask_CreatePokenavList(s32);
 static bool32 IsPrintListItemsTaskActive(void);
@@ -103,7 +103,7 @@ bool32 CreatePokenavList(const struct BgTemplate *bgTemplate, struct PokenavList
         return FALSE;
 
     InitPokenavListWindowState(&list->windowState, listTemplate);
-    if (!CopyPokenavListMenuTemplate(&list->sub, bgTemplate, listTemplate, tileOffset))
+    if (!CopyPokenavListMenuTemplate(&list->view, bgTemplate, listTemplate, tileOffset))
         return FALSE;
 
     CreateLoopedTask(LoopedTask_CreatePokenavList, 6);
@@ -118,8 +118,8 @@ bool32 IsCreatePokenavListTaskActive(void)
 void DestroyPokenavList(void)
 {
     struct PokenavList *list = GetSubstructPtr(POKENAV_SUBSTRUCT_LIST);
-    DestroyListArrows(&list->sub);
-    RemoveWindow(list->sub.listWindow.windowId);
+    DestroyListArrows(&list->view);
+    RemoveWindow(list->view.listWindow.windowId);
     FreePokenavSubstruct(POKENAV_SUBSTRUCT_LIST);
 }
 
@@ -135,13 +135,13 @@ static u32 LoopedTask_CreatePokenavList(s32 state)
     switch (state)
     {
     case 0:
-        InitPokenavListBg(&list->sub);
+        InitPokenavListBg(&list->view);
         return LT_INC_AND_PAUSE;
     case 1:
-        InitPokenavListWindow(&list->sub.listWindow);
+        InitPokenavListWindow(&list->view.listWindow);
         return LT_INC_AND_PAUSE;
     case 2:
-        InitListItems(&list->windowState, &list->sub);
+        InitListItems(&list->windowState, &list->view);
         return LT_INC_AND_PAUSE;
     case 3:
         if (IsPrintListItemsTaskActive())
@@ -152,13 +152,13 @@ static u32 LoopedTask_CreatePokenavList(s32 state)
         LoadListArrowGfx();
         return LT_INC_AND_CONTINUE;
     case 4:
-        CreateListArrowSprites(&list->windowState, &list->sub);
+        CreateListArrowSprites(&list->windowState, &list->view);
         break;
     }
     return LT_FINISH;
 }
 
-static void InitPokenavListBg(struct PokenavListSub *listSub)
+static void InitPokenavListBg(struct PokenavListView *listSub)
 {
     u16 tileNum = (listSub->listWindow.fillValue << 12) | listSub->listWindow.tileOffset;
     BgDmaFill(listSub->listWindow.bg, PIXEL_FILL(1), listSub->listWindow.tileOffset, 1);
@@ -178,7 +178,7 @@ static void InitPokenavListWindow(struct PokenavListMenuWindow *listWindow)
     CopyWindowToVram(listWindow->windowId, COPYWIN_MAP);
 }
 
-static void InitListItems(struct PokenavListWindowState *windowState, struct PokenavListSub *subPtr)
+static void InitListItems(struct PokenavListWindowState *windowState, struct PokenavListView *subPtr)
 {
     s32 numToPrint = windowState->listLength - windowState->windowTopIndex;
     if (numToPrint > windowState->entriesOnscreen)
@@ -187,7 +187,7 @@ static void InitListItems(struct PokenavListWindowState *windowState, struct Pok
     PrintListItems(windowState->listPtr, windowState->windowTopIndex, numToPrint, windowState->listItemSize, 0, subPtr);
 }
 
-static void PrintListItems(void *listPtr, u32 topIndex, u32 numItems, u32 itemSize, u32 printStart, struct PokenavListSub *list)
+static void PrintListItems(void *listPtr, u32 topIndex, u32 numItems, u32 itemSize, u32 printStart, struct PokenavListView *list)
 {
     if (numItems == 0)
         return;
@@ -209,7 +209,7 @@ static bool32 IsPrintListItemsTaskActive(void)
 static u32 LoopedTask_PrintListItems(s32 state)
 {
     u32 row;
-    struct PokenavListSub *listSub = GetSubstructPtr(POKENAV_SUBSTRUCT_LIST);
+    struct PokenavListView *listSub = GetSubstructPtr(POKENAV_SUBSTRUCT_LIST);
 
     switch (state)
     {
@@ -267,24 +267,24 @@ static void MoveListWindow(s32 delta, bool32 printItems)
         if (windowState->windowTopIndex + delta < 0)
             delta = -windowState->windowTopIndex;
         if (printItems)
-            PrintListItems(windowState->listPtr, windowState->windowTopIndex + delta, delta * -1, windowState->listItemSize, delta, &list->sub);
+            PrintListItems(windowState->listPtr, windowState->windowTopIndex + delta, delta * -1, windowState->listItemSize, delta, &list->view);
     }
     else if (printItems)
     {
-        static EWRAM_DATA s32 sMoveWindowDownIndex = 0; // Read, but pointlessly
+        static EWRAM_DATA s32 sMoveWindowDownIndex = 0; // Pointlessly a static variable.
 
         sMoveWindowDownIndex = windowState->windowTopIndex + windowState->entriesOnscreen;
         if (sMoveWindowDownIndex + delta >= windowState->listLength)
             delta = windowState->listLength - sMoveWindowDownIndex;
 
-        PrintListItems(windowState->listPtr, sMoveWindowDownIndex, delta, windowState->listItemSize, windowState->entriesOnscreen, &list->sub);
+        PrintListItems(windowState->listPtr, sMoveWindowDownIndex, delta, windowState->listItemSize, windowState->entriesOnscreen, &list->view);
     }
 
-    CreateMoveListWindowTask(delta, &list->sub);
+    CreateMoveListWindowTask(delta, &list->view);
     windowState->windowTopIndex += delta;
 }
 
-static void CreateMoveListWindowTask(s32 delta, struct PokenavListSub *list)
+static void CreateMoveListWindowTask(s32 delta, struct PokenavListView *list)
 {
     list->startBgY = GetBgY(list->listWindow.bg);
     list->endBgY = list->startBgY + (delta << 12);
@@ -298,7 +298,7 @@ static u32 LoopedTask_MoveListWindow(s32 state)
     s32 oldY, newY;
     bool32 finished;
     struct PokenavList *list = GetSubstructPtr(POKENAV_SUBSTRUCT_LIST);
-    struct PokenavListSub *subPtr = &list->sub;
+    struct PokenavListView *subPtr = &list->view;
 
     switch (state)
     {
@@ -335,7 +335,7 @@ static u32 LoopedTask_MoveListWindow(s32 state)
 bool32 PokenavList_IsMoveWindowTaskActive(void)
 {
     struct PokenavList *list = GetSubstructPtr(POKENAV_SUBSTRUCT_LIST);
-    return IsLoopedTaskActive(list->sub.loopedTaskId);
+    return IsLoopedTaskActive(list->view.loopedTaskId);
 }
 
 static struct PokenavListWindowState *GetPokenavListWindowState(void)
@@ -483,8 +483,8 @@ void PokenavList_DrawCurrentItemIcon(void)
 {
     struct PokenavList *list = GetSubstructPtr(POKENAV_SUBSTRUCT_LIST);
     struct PokenavListWindowState *windowState = &list->windowState;
-    list->sub.iconDrawFunc(list->sub.listWindow.windowId, windowState->windowTopIndex + windowState->selectedIndexOffset, (list->sub.listWindow.unkA + windowState->selectedIndexOffset) & 0xF);
-    CopyWindowToVram(list->sub.listWindow.windowId, COPYWIN_MAP);
+    list->view.iconDrawFunc(list->view.listWindow.windowId, windowState->windowTopIndex + windowState->selectedIndexOffset, (list->view.listWindow.unkA + windowState->selectedIndexOffset) & 0xF);
+    CopyWindowToVram(list->view.listWindow.windowId, COPYWIN_MAP);
 }
 
 static u32 LoopedTask_EraseListForCheckPage(s32 state)
@@ -494,11 +494,11 @@ static u32 LoopedTask_EraseListForCheckPage(s32 state)
     switch (state)
     {
     case 0:
-        ToggleListArrows(&list->sub, TRUE);
+        ToggleListArrows(&list->view, TRUE);
         // fall-through
     case 1:
         if (list->eraseIndex != list->windowState.selectedIndexOffset)
-            EraseListEntry(&list->sub.listWindow, list->eraseIndex, 1);
+            EraseListEntry(&list->view.listWindow, list->eraseIndex, 1);
 
         list->eraseIndex++;
         return LT_INC_AND_PAUSE;
@@ -508,7 +508,7 @@ static u32 LoopedTask_EraseListForCheckPage(s32 state)
             if (list->eraseIndex != list->windowState.entriesOnscreen)
                 return LT_SET_STATE(1);
             if (list->windowState.selectedIndexOffset != 0)
-                EraseListEntry(&list->sub.listWindow, list->eraseIndex, list->windowState.selectedIndexOffset);
+                EraseListEntry(&list->view.listWindow, list->eraseIndex, list->windowState.selectedIndexOffset);
 
             return LT_INC_AND_PAUSE;
         }
@@ -541,28 +541,28 @@ static u32 LoopedTask_PrintCheckPageInfo(s32 state)
     switch (state)
     {
     case 0:
-        PrintCheckPageTrainerName(&list->windowState, &list->sub);
+        PrintCheckPageTrainerName(&list->windowState, &list->view);
         break;
     case 1:
-        PrintMatchCallFieldNames(&list->sub, 0);
+        PrintMatchCallFieldNames(&list->view, 0);
         break;
     case 2:
-        PrintMatchCallFlavorText(&list->windowState, &list->sub, CHECK_PAGE_STRATEGY);
+        PrintMatchCallFlavorText(&list->windowState, &list->view, CHECK_PAGE_STRATEGY);
         break;
     case 3:
-        PrintMatchCallFieldNames(&list->sub, 1);
+        PrintMatchCallFieldNames(&list->view, 1);
         break;
     case 4:
-        PrintMatchCallFlavorText(&list->windowState, &list->sub, CHECK_PAGE_POKEMON);
+        PrintMatchCallFlavorText(&list->windowState, &list->view, CHECK_PAGE_POKEMON);
         break;
     case 5:
-        PrintMatchCallFieldNames(&list->sub, 2);
+        PrintMatchCallFieldNames(&list->view, 2);
         break;
     case 6:
-        PrintMatchCallFlavorText(&list->windowState, &list->sub, CHECK_PAGE_INTRO_1);
+        PrintMatchCallFlavorText(&list->windowState, &list->view, CHECK_PAGE_INTRO_1);
         break;
     case 7:
-        PrintMatchCallFlavorText(&list->windowState, &list->sub, CHECK_PAGE_INTRO_2);
+        PrintMatchCallFlavorText(&list->windowState, &list->view, CHECK_PAGE_INTRO_2);
         break;
     default:
         return LT_FINISH;
@@ -574,14 +574,14 @@ static u32 LoopedTask_ReshowListFromCheckPage(s32 state)
 {
     struct PokenavList *list;
     struct PokenavListWindowState *windowState;
-    struct PokenavListSub *subPtr;
+    struct PokenavListView *subPtr;
 
     if (IsDma3ManagerBusyWithBgCopy())
         return LT_PAUSE;
 
     list = GetSubstructPtr(POKENAV_SUBSTRUCT_LIST);
     windowState = &list->windowState;
-    subPtr = &list->sub;
+    subPtr = &list->view;
 
     switch (state)
     {
@@ -633,7 +633,7 @@ static u32 LoopedTask_ReshowListFromCheckPage(s32 state)
         }
         return LT_PAUSE;
     case 4:
-        PrintListItems(windowState->listPtr, windowState->windowTopIndex + list->eraseIndex, 1, windowState->listItemSize, list->eraseIndex, &list->sub);
+        PrintListItems(windowState->listPtr, windowState->windowTopIndex + list->eraseIndex, 1, windowState->listItemSize, list->eraseIndex, &list->view);
         return LT_INC_AND_PAUSE;
     case 5:
         if (IsPrintListItemsTaskActive())
@@ -696,7 +696,7 @@ static void SetListMarginTile(struct PokenavListMenuWindow *listWindow, bool32 d
 }
 
 // Print the trainer's name and title at the top of their check page
-static void PrintCheckPageTrainerName(struct PokenavListWindowState *state, struct PokenavListSub *list)
+static void PrintCheckPageTrainerName(struct PokenavListWindowState *state, struct PokenavListView *list)
 {
     u8 colors[3] = {TEXT_COLOR_TRANSPARENT, TEXT_COLOR_DARK_GRAY, TEXT_COLOR_LIGHT_RED};
 
@@ -709,7 +709,7 @@ static void PrintCheckPageTrainerName(struct PokenavListWindowState *state, stru
 }
 
 // Print the trainer's name and title for the list (to replace the check page name and title, which has a red background)
-static void PrintMatchCallListTrainerName(struct PokenavListWindowState *state, struct PokenavListSub *list)
+static void PrintMatchCallListTrainerName(struct PokenavListWindowState *state, struct PokenavListView *list)
 {
     list->bufferItemFunc(state->listPtr + state->listItemSize * state->windowTopIndex, list->itemTextBuffer);
     FillWindowPixelRect(list->listWindow.windowId, PIXEL_FILL(1), 0, list->listWindow.unkA * 16, list->listWindow.width * 8, 16);
@@ -718,7 +718,7 @@ static void PrintMatchCallListTrainerName(struct PokenavListWindowState *state, 
     CopyWindowToVram(list->listWindow.windowId, COPYWIN_FULL);
 }
 
-static void PrintMatchCallFieldNames(struct PokenavListSub *list, u32 fieldId)
+static void PrintMatchCallFieldNames(struct PokenavListView *list, u32 fieldId)
 {
     const u8 *fieldNames[] = {
         gText_PokenavMatchCall_Strategy,
@@ -733,7 +733,7 @@ static void PrintMatchCallFieldNames(struct PokenavListSub *list, u32 fieldId)
     CopyWindowRectToVram(list->listWindow.windowId, COPYWIN_GFX, 0, top << 1, list->listWindow.width, 2);
 }
 
-static void PrintMatchCallFlavorText(struct PokenavListWindowState *windowState, struct PokenavListSub *list, u32 checkPageEntry)
+static void PrintMatchCallFlavorText(struct PokenavListWindowState *windowState, struct PokenavListView *list, u32 checkPageEntry)
 {
     // lines 1, 3, and 5 are the field names printed by PrintMatchCallFieldNames
     static const u8 lineOffsets[CHECK_PAGE_ENTRY_COUNT] = {
@@ -832,7 +832,7 @@ static void LoadListArrowGfx(void)
     Pokenav_AllocAndLoadPalettes(sListArrowPalettes);
 }
 
-static void CreateListArrowSprites(struct PokenavListWindowState *windowState, struct PokenavListSub *list)
+static void CreateListArrowSprites(struct PokenavListWindowState *windowState, struct PokenavListView *list)
 {
     u32 spriteId;
     s16 x;
@@ -852,7 +852,7 @@ static void CreateListArrowSprites(struct PokenavListWindowState *windowState, s
     list->upArrow->callback = SpriteCB_UpArrow;
 }
 
-static void DestroyListArrows(struct PokenavListSub *list)
+static void DestroyListArrows(struct PokenavListView *list)
 {
     DestroySprite(list->rightArrow);
     DestroySprite(list->upArrow);
@@ -861,7 +861,7 @@ static void DestroyListArrows(struct PokenavListSub *list)
     FreeSpritePaletteByTag(PALTAG_ARROW);
 }
 
-static void ToggleListArrows(struct PokenavListSub *list, bool32 invisible)
+static void ToggleListArrows(struct PokenavListView *list, bool32 invisible)
 {
     if (invisible)
     {
@@ -925,8 +925,8 @@ static void SpriteCB_UpArrow(struct Sprite *sprite)
 void PokenavList_ToggleVerticalArrows(bool32 invisible)
 {
     struct PokenavList *list = GetSubstructPtr(POKENAV_SUBSTRUCT_LIST);
-    list->sub.upArrow->sInvisible = invisible;
-    list->sub.downArrow->sInvisible = invisible;
+    list->view.upArrow->sInvisible = invisible;
+    list->view.downArrow->sInvisible = invisible;
 }
 
 #undef sTimer
@@ -961,7 +961,7 @@ static void InitPokenavListWindowState(struct PokenavListWindowState *dst, struc
     }
 }
 
-static bool32 CopyPokenavListMenuTemplate(struct PokenavListSub *dest, const struct BgTemplate *bgTemplate, struct PokenavListTemplate *template, s32 tileOffset)
+static bool32 CopyPokenavListMenuTemplate(struct PokenavListView *dest, const struct BgTemplate *bgTemplate, struct PokenavListTemplate *template, s32 tileOffset)
 {
     struct WindowTemplate window;
 
