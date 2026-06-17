@@ -1,0 +1,169 @@
+<!DOCTYPE html public "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="ja">
+
+<head><!-- Edited by Ron D., 5/20/04 -->
+
+<link rel="stylesheet" type="text/css" href="style.css">
+<title>Revision History</title>
+</head>
+
+<body>
+
+<p><br></p>
+
+
+<h2 ALIGN="CENTER"><a NAME="version_0">Revision History</a></h2>
+<hr WIDTH="600" ALIGN="CENTER">
+<table WIDTH="600" ALIGN="CENTER" SUMMARY="version_up_info">
+<br />
+<tr><td>
+<p>Version 1.07a <img src="right.gif" align="absmiddle" width="13" height="5"> 1.07b
+<ol>
+  <li><code>mks4agbLib.h</code> and <code>MusicPlayDef.s</code> version information was incorrect, so we fixed it.</li>
+  <li>Fixed the output version information of <code>aif2agb.exe</code>, <code>mid2agb.exe</code>, and <code>mks4agb.exe</code>.</li>
+</ol>
+</p>
+</td></tr>
+
+<tr><td>
+<p>Version 1.07 <img src="right.gif" align="absmiddle" width="13" height="5"> 1.07a
+<ol>
+  <li>Corrected the example of program code which checks if Music Player is playing to the correct program code in "Sound Functions -- Detailed Descriptions" in the Programmer's Manual.
+</ol>
+</p>
+</td></tr>
+
+<tr><td>
+<p>Version 1.06a <img src="right.gif" align="absmiddle" width="13" height="5"> 1.07
+<ol>
+  <li>Corrected a malfunction in the envelope of sound 4 during a fade.</li>
+  <li>Added exclusive processing for <code>m4aMPlayImmInit</code> with other functions.</li>
+</ol>
+</p>
+</td></tr>
+
+<tr><td>
+<p>Version 1.06 <img src="right.gif" align="absmiddle" width="13" height="5"> 1.06a
+<ol>
+  <li>Fixed program so proper attribute is set for section in object file.</li>
+</ol>
+</p>
+</td></tr>
+
+<tr><td>
+<p>Version 1.05 <img src="right.gif" align="absmiddle" width="13" height="5"> 1.06
+<ol>
+  <li>Enabled the sound sweep UP to function with compatible sound 1.</li>
+  <li>Enabled changes to the tone color of song settings to be reflected in a normal <code>make</code>.</li>
+  <li>Fixed the basic problem with separate panpots with tone colors for the rhythm set.</li>
+  <li>When waveform data with the same name but a different compressibility rate 
+    was registered, all rates other than the first one were ignored. Fixed this.</li>
+  <li>Fixed the sound DMA hardware.</li>
+  <li>Fixed the negative impact on the envelope for compatible sounds 1, 2, and 4 when dealing with the sweep problem.</li>
+  <li>Enabled priority to be determined when starting a song.</li>
+  <li>Added functions <code>m4aMPlayFadeOutPause()</code> and <code>m4aMPlayFadeInContinue()</code>.</li>
+  <li>Fixed the problem with a compatible sound's pseudo-echo.</li>
+  <li>Fixed the compatible sound 3 initialization noise with <code>m4aSoundInit()</code>.</li>
+</ol>
+</p>
+</td></tr>
+
+<tr><td>
+<p>Version 1.04 <img src="right.gif" align="absmiddle" width="13" height="5"> 1.05<br> 
+<ol>
+  <li>Made it possible to use a portion of the sound code in the system ROM. Added the object 
+    file which is used with <code>m4aLibUSC.o</code>.</li> 
+  <li>The panpot specification of the rhythm set is no longer being affected by the 
+    sound produced from other players.</li> 
+  <li>Made an execution version of the high speed internal RAM.</li> 
+  <li>Enabled one to limit the processing time of <code>m4aSoundMain()</code> during each frame.</li> 
+  <li>Enabled the registration of song data number 1999.</li> 
+  <li>Made it possible to set the loop position for each track with the MIDI control check number.</li>
+</ol>
+</p>
+</td></tr>
+
+<tr><td>
+<p>Version 1.03c <img src="right.gif" align="absmiddle" width="13" height="5"> 1.04<br> 
+<ol>
+  <li>Fixed problem with interval when value was zero with the functions 
+      <code>m4aMPlayModDepthSet()</code> and <code>m4aMPlayLFOSpeedSet()</code>.</li> 
+  <li>Fixed problem of not being able to set the sweep value to ineffective with compatible 
+    sound 1.</li> 
+  <li>Fixed abnormality due to fade out with volume of part where tremolo used.</li> 
+  <li>Changed the function name for <code>MPlayAllContinue()</code> to <code>m4aMPlayAllContinue()</code>.</li> 
+  <li>Added the function <code>m4aMPlayImmInit()</code>, which immediately 
+    initializes the various tracks of the song you plan on starting to play.</li> 
+  <li>Fixed problem of abnormal operation due to timing when interrupting with 
+      <code>m4aSoundVSync()</code> during change of direct sound playback frequency.</li> 
+  <li>Made so you can separate the segments of the program executed with RAM from other work 
+    areas with linker script.</li>
+</ol>
+</p>
+</td></tr>
+
+<tr><td>
+<p>Version 1.03 <img src="right.gif" align="absmiddle" width="13" height="5"> 1.03c<br> 
+<ol>
+  <li>Fixed calculation of total size display for simple monitor.</li> 
+  <li>Fixed problem with value for <code>m4a_mplay???.stat</code> when performance ends.</li> 
+  <li>Changed compatibility of MEMACC, PRIO with MIDI Control Change Number.</li> 
+  <li>Changed addition value of MIDI Undefined Control Change Number from 20 to 30 to avoid redundancy.</li>
+</ol>
+</p>
+</td></tr>
+
+<tr><td>
+<p>Version 1.02 <img src="right.gif" align="absmiddle" width="13" height="5"> 1.03<br> 
+<ol>
+  <li>Fixed problem of vibrato not functioning properly.</li> 
+  <li>Added display of total size of all sound objects to simple monitor.</li> 
+  <li>Added display of number of CH currently being used by direct sound with the simple monitor.</li> 
+  <li>Changed the addition value used with this system's MIDI Undefined Control Change Number 
+    from 88 to 20.</li> 
+  <li>Added the MEMACC instruction to the song data. Added <code>memacc_s</code> to <code>mks4agb.ini</code>.</li>
+</ol>
+</p>
+</td></tr>
+
+<tr><td>
+<p>Version 1.01 <img src="right.gif" align="absmiddle" width="13" height="5"> 1.02<br> 
+<ol>
+  <li>Fixed the problem of incomplete initialization of the Music Player work area.</li> 
+  <li>Fixed rare problem of an infinite loop occurring if a new song was started on the same 
+    Music Player during chord play on the same track.</li> 
+  <li>Made possible to create code that uses only 1 channel DMA. Added object file used with this.</li> 
+  <li>Reduced the number of stacks used for the function <code>m4aSoundMain()</code>.</li> 
+  <li>Changed so that .aif files without INST-chunk can be converted now.</li> 
+  <li>Changed the spelling of pan from &quot;pam&quot; to &quot;pan&quot;.</li>
+</ol>
+</p>
+</td></tr>
+
+<tr><td>
+<p>Version 1.00 <img src="right.gif" align="absmiddle" width="13" height="5"> 1.01<br> 
+<ol>
+  <li>Upgraded the Simple Monitor. The data files of the Simple Monitor 
+    <code>SndMonDat.s</code> and <code>SndMonDat.o</code> were output.</li> 
+  <li>Fixed the bug of not running if the long name of the directory was used in the 
+    directory for this system.</li> 
+  <li>Fixed the bug of the values of Attack, Decay, and Release for CGB-compatible sound not 
+    working normally for the tone color settings in <code>mks4agb.ini</code>.</li>
+</ol>
+</p>
+</td></tr> 
+</table> 
+ 
+<hr WIDTH="600" ALIGN="CENTER"> 
+ 
+<table WIDTH="600" ALIGN="CENTER" SUMMARY="link"> 
+  <tr> 
+    <td><b>Top :</b>[ <a HREF="../p_index.html">Table of Contents</a> ]<br> 
+    </td> 
+  </tr> 
+</table> 
+ 
+<p><br> 
+</p> 
+</body> 
+</html> 
