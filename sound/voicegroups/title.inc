@@ -108,8 +108,8 @@ voice_group title
 	voice_directsound 60, 0, DirectSoundWaveData_sc88pro_timpani, 255, 0, 193, 153
 
 	@ --- ENSEMBLES (48-55) ---
-	@ 048: String Ensemble 1 -> Timpani for mus_title
-	voice_keysplit voicegroup_th09_orchestra, keysplit_th09_orchestra
+	@ 048: String Ensemble 1
+	voice_keysplit voicegroup_strings_keysplit, keysplit_strings
 	@ 049: String Ensemble 2
 	voice_directsound 60, 0, DirectSoundWaveData_sc88pro_string_ensemble_72, 220, 255, 255, 120
 	@ 050: SynthStrings 1 (Proxy: Ensemble 60)
@@ -279,23 +279,26 @@ voice_group title
 
 	.align 2
 
-keysplit th09_orchestra, 40
-	split 0, 42
-	split 1, 127
-
-voice_group th09_orchestra
-	voice_directsound 60, 0, DirectSoundWaveData_sc88pro_orchestra_snare, 255, 0, 255, 242
-	voice_directsound 60, 0, DirectSoundWaveData_sc88pro_timpani, 255, 0, 193, 153
-
 voice_group th09_drumset, 36
+	@ note 36: Bass Drum 1
 	voice_directsound_no_resample 60, 64, DirectSoundWaveData_sc88pro_rnd_kick, 255, 0, 255, 242
+	@ note 37: (unused)
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
+	@ note 38: (unused)
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
+	@ note 39: (unused)
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
+	@ note 40: (unused)
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
+	@ note 41: (unused)
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
-	voice_directsound_no_resample 40, 64, DirectSoundWaveData_sc88pro_tambourine, 255, 60, 10, 204
+	@ note 42: Closed Hi-Hat
+	voice_directsound_no_resample 40, 64, DirectSoundWaveData_unknown_close_hihat, 255, 0, 255, 204
+	@ note 43: (unused)
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
+	@ note 44: (unused)
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
+	@ note 45: (unused)
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
-	voice_directsound_no_resample 40, 64, DirectSoundWaveData_sc88pro_tambourine, 255, 200, 127, 204
+	@ note 46: Open Hi-Hat
+	voice_directsound_no_resample 40, 64, DirectSoundWaveData_unknown_open_hihat, 255, 0, 255, 204
