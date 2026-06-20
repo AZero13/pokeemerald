@@ -31,7 +31,7 @@ voice_group title
 	@ 013: Xylophone
 	voice_directsound 60, 0, DirectSoundWaveData_sc88pro_xylophone, 255, 250, 20, 60
 	@ 014: Tubular Bells
-	voice_directsound 60, 0, DirectSoundWaveData_sc88pro_tubular_bell, 255, 200, 150, 100
+	voice_directsound 60, 0, DirectSoundWaveData_sc88pro_tubular_bell, 255, 216, 90, 242
 	@ 015: Dulcimer (Proxy: Koto High)
 	voice_directsound 60, 0, DirectSoundWaveData_unknown_koto_high, 255, 230, 80, 70
 
@@ -103,7 +103,7 @@ voice_group title
 	@ 045: Pizzicato Strings
 	voice_directsound 60, 0, DirectSoundWaveData_sc88pro_pizzicato_strings, 255, 230, 0, 60
 	@ 046: Orchestral Harp
-	voice_directsound 60, 0, DirectSoundWaveData_sc88pro_harp, 255, 240, 50, 80
+	voice_directsound 60, 0, DirectSoundWaveData_sc88pro_harp, 255, 246, 0, 235
 	@ 047: Timpani
 	voice_directsound 60, 0, DirectSoundWaveData_sc88pro_timpani, 255, 0, 193, 153
 
@@ -179,23 +179,23 @@ voice_group title
 
 	@ --- SYNTH LEADS, PADS & FX (80-126) ---
 	@ 080: Square Lead
-	voice_directsound 60, 0, DirectSoundWaveData_sc88pro_square_wave, 255, 255, 255, 100
+	voice_directsound 60, 0, DirectSoundWaveData_sc88pro_square_wave, 255, 204, 231, 127
 	@ 081: Sawtooth Lead (Proxy: Scream Drive)
-	voice_directsound 60, 0, DirectSoundWaveData_sd90_special_scream_drive, 255, 255, 255, 100
+	voice_directsound 60, 0, DirectSoundWaveData_sd90_special_scream_drive, 255, 0, 255, 195
 	@ 082: Calliope (Proxy: Unknown 1)
-	voice_directsound 60, 0, DirectSoundWaveData_unknown_1, 255, 255, 255, 100
+	voice_directsound 60, 0, DirectSoundWaveData_unknown_1, 255, 204, 231, 127
 	@ 083: Chiff (Proxy: Unknown 2)
-	voice_directsound 60, 0, DirectSoundWaveData_unknown_2, 255, 255, 255, 100
+	voice_directsound 60, 0, DirectSoundWaveData_unknown_2, 255, 204, 231, 127
 	@ 084: Charang (Proxy: Unknown 3)
-	voice_directsound 60, 0, DirectSoundWaveData_unknown_3, 255, 255, 255, 100
+	voice_directsound 60, 0, DirectSoundWaveData_unknown_3, 255, 204, 231, 127
 	@ 085: Voice (Proxy: Choir Ahhs)
-	voice_directsound 60, 0, DirectSoundWaveData_classical_choir_voice_ahhs, 255, 255, 255, 100
+	voice_directsound 60, 0, DirectSoundWaveData_classical_choir_voice_ahhs, 200, 255, 255, 120
 	@ 086: Fifths Lead (Proxy: Unknown 4)
-	voice_directsound 60, 0, DirectSoundWaveData_unknown_4, 255, 255, 255, 100
+	voice_directsound 60, 0, DirectSoundWaveData_unknown_4, 255, 204, 231, 127
 	@ 087: Bass & Lead (Proxy: Trinity Big Boned)
-	voice_directsound 60, 0, DirectSoundWaveData_trinity_big_boned, 255, 255, 255, 100
+	voice_directsound 60, 0, DirectSoundWaveData_trinity_big_boned, 255, 165, 154, 127
 	@ 088: New Age (Proxy: Unknown 5)
-	voice_directsound 60, 0, DirectSoundWaveData_unknown_5, 255, 255, 255, 100
+	voice_directsound 60, 0, DirectSoundWaveData_unknown_5, 255, 204, 231, 127
 	@ 089: Warm (Proxy: Unknown 6)
 	voice_directsound 60, 0, DirectSoundWaveData_unknown_6, 255, 255, 255, 100
 	@ 090: Polysynth (Proxy: Unknown 7)
@@ -293,7 +293,7 @@ voice_group th09_drumset, 36
 	@ note 41: (unused)
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
 	@ note 42: Closed Hi-Hat
-	voice_directsound_no_resample 40, 64, DirectSoundWaveData_unknown_close_hihat, 255, 0, 255, 204
+	voice_directsound_no_resample 60, 79, DirectSoundWaveData_unknown_close_hihat, 255, 127, 0, 188
 	@ note 43: (unused)
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
 	@ note 44: (unused)
@@ -301,4 +301,4 @@ voice_group th09_drumset, 36
 	@ note 45: (unused)
 	voice_square_1 60, 0, 0, 2, 0, 0, 15, 0
 	@ note 46: Open Hi-Hat
-	voice_directsound_no_resample 40, 64, DirectSoundWaveData_unknown_open_hihat, 255, 0, 255, 204
+	voice_directsound_no_resample 60, 79, DirectSoundWaveData_unknown_open_hihat, 255, 242, 141, 0
