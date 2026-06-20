@@ -139,7 +139,7 @@ voice_group title
 	@ 061: Brass Section (Proxy: French Horn 72)
 	voice_directsound 60, 0, DirectSoundWaveData_sc88pro_french_horn_72, 240, 255, 255, 100
 	@ 062: SynthBrass 1 -> Trumpet Keysplit
-	voice_keysplit voicegroup_trumpet_keysplit, keysplit_trumpet
+	voice_keysplit voicegroup_french_horn_keysplit, keysplit_french_horn
 	@ 063: SynthBrass 2 (Proxy: Tuba 39 pitched)
 	voice_directsound 60, 0, DirectSoundWaveData_sc88pro_tuba_39, 240, 255, 255, 100
 
