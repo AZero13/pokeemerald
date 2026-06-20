@@ -54,7 +54,7 @@ voice_group title
 	voice_directsound 60, 0, DirectSoundWaveData_sc88pro_accordion, 255, 255, 255, 100
 
 	@ --- GUITARS (24-31) ---
-	@ 024: Acoustic Guitar (Nylon)
+	@ 024: NylonGtr
 	voice_directsound 60, 0, DirectSoundWaveData_sc88pro_nylon_str_guitar, 255, 249, 25, 76
 	@ 025: Acoustic Guitar (Steel - Proxy: Nylon)
 	voice_directsound 60, 0, DirectSoundWaveData_sc88pro_nylon_str_guitar, 255, 240, 40, 80
