@@ -2303,7 +2303,7 @@ static void MoveBattleBarGraphically(u8 battler, u8 whichBar)
                           (void *)(OBJ_VRAM0 + (gSprites[healthbarSpriteId].oam.tileNum + 2 + i) * TILE_SIZE_4BPP), 32);
             else
                 CpuCopy32(GetHealthboxElementGfxPtr(barElementId) + array[i] * 32,
-                          (void *)(OBJ_VRAM0 + 64 + (i + gSprites[healthbarSpriteId].oam.tileNum) * TILE_SIZE_4BPP), 32);
+                          (void *)(OBJ_VRAM0 + (gSprites[healthbarSpriteId].oam.tileNum + 4 + i - 2) * TILE_SIZE_4BPP), 32);
         }
         break;
     case EXP_BAR:
@@ -2333,12 +2333,16 @@ static void MoveBattleBarGraphically(u8 battler, u8 whichBar)
 
 static s32 CalcNewBarValue(s32 maxValue, s32 oldValue, s32 receivedValue, s32 *currValue, u8 scale, u16 toAdd)
 {
-    s32 ret, newValue;
-    scale *= 8;
+    s32 newValue;
+    s32 ret;
+    u8 scaleDot;
+    s32 fraction;
+
+    scaleDot = scale * 8;
 
     if (*currValue == -32768) // first function call
     {
-        if (maxValue < scale)
+        if (maxValue < scaleDot)
             *currValue = Q_24_8(oldValue);
         else
             *currValue = oldValue;
@@ -2350,7 +2354,7 @@ static s32 CalcNewBarValue(s32 maxValue, s32 oldValue, s32 receivedValue, s32 *c
     else if (newValue > maxValue)
         newValue = maxValue;
 
-    if (maxValue < scale)
+    if (maxValue < scaleDot)
     {
         if (newValue == Q_24_8_TO_INT(*currValue) && (*currValue & 0xFF) == 0)
             return -1;
@@ -2361,13 +2365,13 @@ static s32 CalcNewBarValue(s32 maxValue, s32 oldValue, s32 receivedValue, s32 *c
             return -1;
     }
 
-    if (maxValue < scale) // handle cases of max var having less pixels than the whole bar
+    if (maxValue < scaleDot) // handle cases of max var having less pixels than the whole bar
     {
-        s32 toAdd = Q_24_8(maxValue) / scale;
+        fraction = Q_24_8(maxValue) / scaleDot;
 
         if (receivedValue < 0) // fill bar right
         {
-            *currValue += toAdd;
+            *currValue += fraction;
             ret = Q_24_8_TO_INT(*currValue);
             if (ret >= newValue)
             {
@@ -2377,7 +2381,7 @@ static s32 CalcNewBarValue(s32 maxValue, s32 oldValue, s32 receivedValue, s32 *c
         }
         else // move bar left
         {
-            *currValue -= toAdd;
+            *currValue -= fraction;
             ret = Q_24_8_TO_INT(*currValue);
             // try round up
             if ((*currValue & 0xFF) > 0)
@@ -2396,21 +2400,20 @@ static s32 CalcNewBarValue(s32 maxValue, s32 oldValue, s32 receivedValue, s32 *c
             *currValue += toAdd;
             if (*currValue > newValue)
                 *currValue = newValue;
-            ret = *currValue;
         }
         else // move bar left
         {
             *currValue -= toAdd;
             if (*currValue < newValue)
                 *currValue = newValue;
-            ret = *currValue;
         }
+        ret = *currValue;
     }
 
     return ret;
 }
 
-static u8 CalcBarFilledPixels(s32 maxValue, s32 oldValue, s32 receivedValue, s32 *currValue, u8 *pixelsArray, u8 scale)
+static u8 CalcBarFilledPixels(s32 maxValue, s32 oldValue, s32 receivedValue, s32 *currValue, u8 *pixelsArray, u8 scaleDot)
 {
     u8 pixels, filledPixels, totalPixels;
     u8 i;
@@ -2421,9 +2424,9 @@ static u8 CalcBarFilledPixels(s32 maxValue, s32 oldValue, s32 receivedValue, s32
     else if (newValue > maxValue)
         newValue = maxValue;
 
-    totalPixels = scale * 8;
+    totalPixels = scaleDot * 8;
 
-    for (i = 0; i < scale; i++)
+    for (i = 0; i < scaleDot; i++)
         pixelsArray[i] = 0;
 
     if (maxValue < totalPixels)
@@ -2440,7 +2443,7 @@ static u8 CalcBarFilledPixels(s32 maxValue, s32 oldValue, s32 receivedValue, s32
     }
     else
     {
-        for (i = 0; i < scale; i++)
+        for (i = 0; i < scaleDot; i++)
         {
             if (pixels >= 8)
             {
@@ -2494,12 +2497,12 @@ static void Debug_TestHealthBar_Helper(struct TestingBar *barInfo, s32 *currValu
     CpuCopy16(src, dest, sizeof(src));
 }
 
-static u8 GetScaledExpFraction(s32 oldValue, s32 receivedValue, s32 maxValue, u8 scale)
+static u8 GetScaledExpFraction(s32 oldValue, s32 receivedValue, s32 maxValue, u8 scaleDot)
 {
     s32 newVal, result;
     s8 oldToMax, newToMax;
 
-    scale *= 8;
+    scaleDot *= 8;
     newVal = oldValue - receivedValue;
 
     if (newVal < 0)
@@ -2507,16 +2510,16 @@ static u8 GetScaledExpFraction(s32 oldValue, s32 receivedValue, s32 maxValue, u8
     else if (newVal > maxValue)
         newVal = maxValue;
 
-    oldToMax = oldValue * scale / maxValue;
-    newToMax = newVal * scale / maxValue;
+    oldToMax = oldValue * scaleDot / maxValue;
+    newToMax = newVal * scaleDot / maxValue;
     result = oldToMax - newToMax;
 
     return abs(result);
 }
 
-u8 GetScaledHPFraction(s16 hp, s16 maxhp, u8 scale)
+u8 GetScaledHPFraction(s16 hp, s16 maxhp, u8 scaleDot)
 {
-    u8 result = hp * scale / maxhp;
+    u8 result = hp * scaleDot / maxhp;
 
     if (result == 0 && hp > 0)
         return 1;
@@ -2548,9 +2551,9 @@ u8 GetHPBarLevel(s16 hp, s16 maxhp)
     return result;
 }
 
-static u8 *AddTextPrinterAndCreateWindowOnHealthbox(const u8 *str, u32 x, u32 y, u32 bgColor, u32 *windowId)
+static u8 *AddTextPrinterAndCreateWindowOnHealthbox(const u8 *str, u32 x, u32 y, u32 bgColor, s32 *windowId)
 {
-    u16 winId;
+    s32 winId;
     u8 color[3];
     struct WindowTemplate winTemplate = sHealthboxWindowTemplate;
 
@@ -2584,16 +2587,14 @@ static void HpTextIntoHealthboxObject(void *dest, u8 *windowTileData, u32 window
 
 static void TextIntoHealthboxObject(void *dest, u8 *windowTileData, s32 windowWidth)
 {
+    int i;
     CpuCopy32(windowTileData + 256, dest + 256, windowWidth * TILE_SIZE_4BPP);
-// + 256 as that prevents the top 4 blank rows of sHealthboxWindowTemplate from being copied
-    if (windowWidth > 0)
+    // + 256 as that prevents the top 4 blank rows of sHealthboxWindowTemplate from being copied
+    for (i = 0; i < windowWidth; i++)
     {
-        do
-        {
-            CpuCopy32(windowTileData + 20, dest + 20, 12);
-            dest += 32, windowTileData += 32;
-            windowWidth--;
-        } while (windowWidth != 0);
+        CpuCopy32(windowTileData + 20, dest + 20, 12);
+        dest += 32;
+        windowTileData += 32;
     }
 }
 
