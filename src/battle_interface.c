@@ -868,7 +868,7 @@ static void UNUSED Debug_DrawNumberPair(s16 number1, s16 number2, u16 *dest)
 
 u8 CreateBattlerHealthboxSprites(u8 battler)
 {
-    s16 data6 = 0;
+    u8 data6 = 0;
     u8 healthboxLeftSpriteId, healthboxRightSpriteId;
     u8 healthbarSpriteId;
     struct Sprite *healthBarSpritePtr;
@@ -1104,8 +1104,8 @@ void InitBattlerHealthboxCoords(u8 battler)
 
 static void UpdateLvlInHealthbox(u8 healthboxSpriteId, u8 lvl)
 {
-    u32 windowId, spriteTileNum;
-    u8 *windowTileData;
+    s32 windowId, spriteTileNum;
+    const u8 *windowTileData;
     u8 text[16];
     u32 xPos;
     u8 *objVram;
@@ -1114,7 +1114,7 @@ static void UpdateLvlInHealthbox(u8 healthboxSpriteId, u8 lvl)
     text[1] = CHAR_LV_2;
 
     objVram = ConvertIntToDecimalStringN(text + 2, lvl, STR_CONV_MODE_LEFT_ALIGN, 3);
-    xPos = 5 * (3 - (objVram - (text + 2)));
+    xPos = (3 - (objVram - (text + 2))) * 5;
 
     windowTileData = AddTextPrinterAndCreateWindowOnHealthbox(text, xPos, 3, 2, &windowId);
     spriteTileNum = gSprites[healthboxSpriteId].oam.tileNum * TILE_SIZE_4BPP;
