@@ -159,16 +159,16 @@ enum
 };
 
 static const u8 *GetHealthboxElementGfxPtr(u8);
-static u8 *AddTextPrinterAndCreateWindowOnHealthbox(const u8 *, u32, u32, u32, s32 *);
+static u8 *AddTextPrinterAndCreateWindowOnHealthbox(const u8 *, s32, s32, u32, s32 *);
 
 static void RemoveWindowOnHealthbox(u32 windowId);
 static void UpdateHpTextInHealthboxInDoubles(u8, s16, u8);
 static void UpdateStatusIconInHealthbox(u8);
 
-static void TextIntoHealthboxObject(void *, u8 *, s32);
-static void SafariTextIntoHealthboxObject(void *, u8 *, u32);
-static void HpTextIntoHealthboxObject(void *, u8 *, u32);
-static void FillHealthboxObject(void *, u32, u32);
+static void TextIntoHealthboxObject(u8 *, const u8 *, s32);
+static void SafariTextIntoHealthboxObject(u8 *, const u8 *, u32);
+static void HpTextIntoHealthboxObject(u8 *, const u8 *, u32);
+static void FillHealthboxObject(u8 *, u32, u32);
 
 static void Task_HidePartyStatusSummary_BattleStart_1(u8);
 static void Task_HidePartyStatusSummary_BattleStart_2(u8);
@@ -2193,7 +2193,7 @@ void UpdateHealthboxAttribute(u8 healthboxSpriteId, struct Pokemon *mon, u8 elem
         if (!isDoubles && (elementId == HEALTHBOX_EXP_BAR || elementId == HEALTHBOX_ALL))
         {
             u16 species;
-            u32 exp, currLevelExp;
+            s32 exp, currLevelExp;
             s32 currExpBarValue, maxExpBarValue;
             u8 level;
 
@@ -2223,9 +2223,7 @@ void UpdateHealthboxAttribute(u8 healthboxSpriteId, struct Pokemon *mon, u8 elem
         if (elementId == HEALTHBOX_HEALTH_BAR || elementId == HEALTHBOX_ALL)
         {
             LoadBattleBarGfx(0);
-            maxHp = GetMonData(mon, MON_DATA_MAX_HP);
-            currHp = GetMonData(mon, MON_DATA_HP);
-            SetBattleBarStruct(battler, healthboxSpriteId, maxHp, currHp, 0);
+            SetBattleBarStruct(battler, healthboxSpriteId, GetMonData(mon, MON_DATA_MAX_HP), GetMonData(mon, MON_DATA_HP), 0);
             MoveBattleBar(battler, healthboxSpriteId, HEALTH_BAR, 0);
         }
         if (elementId == HEALTHBOX_NICK || elementId == HEALTHBOX_ALL)
@@ -2238,7 +2236,7 @@ void UpdateHealthboxAttribute(u8 healthboxSpriteId, struct Pokemon *mon, u8 elem
 #define B_EXPBAR_PIXELS 64
 #define B_HEALTHBAR_PIXELS 48
 
-s32 MoveBattleBar(u8 battler, u8 healthboxSpriteId, u8 whichBar, u8 unused)
+s32 MoveBattleBar(u8 battler, u8 healthboxSpriteId, u8 whichBar, s32 unused)
 {
     s32 currentBarValue;
     u16 expFraction;
@@ -2554,7 +2552,7 @@ u8 GetHPBarLevel(s16 hp, s16 maxhp)
     return result;
 }
 
-static u8 *AddTextPrinterAndCreateWindowOnHealthbox(const u8 *str, u32 x, u32 y, u32 bgColor, s32 *windowId)
+static u8 *AddTextPrinterAndCreateWindowOnHealthbox(const u8 *str, s32 x, s32 y, u32 bgColor, s32 *windowId)
 {
     s32 winId;
     u8 color[3];
@@ -2578,17 +2576,17 @@ static void RemoveWindowOnHealthbox(u32 windowId)
     RemoveWindow(windowId);
 }
 
-static void FillHealthboxObject(void *dest, u32 valMult, u32 numTiles)
+static void FillHealthboxObject(u8 *dest, u32 valMult, u32 numTiles)
 {
     CpuFill32(0x11111111 * valMult, dest, numTiles * TILE_SIZE_4BPP);
 }
 
-static void HpTextIntoHealthboxObject(void *dest, u8 *windowTileData, u32 windowWidth)
+static void HpTextIntoHealthboxObject(u8 *dest, const u8 *windowTileData, u32 windowWidth)
 {
     CpuCopy32(windowTileData + 256, dest, windowWidth * TILE_SIZE_4BPP);
 }
 
-static void TextIntoHealthboxObject(void *dest, u8 *windowTileData, s32 windowWidth)
+static void TextIntoHealthboxObject(u8 *dest, const u8 *windowTileData, s32 windowWidth)
 {
     int i;
     CpuCopy32(windowTileData + 256, dest + 256, windowWidth * TILE_SIZE_4BPP);
@@ -2601,7 +2599,7 @@ static void TextIntoHealthboxObject(void *dest, u8 *windowTileData, s32 windowWi
     }
 }
 
-static void SafariTextIntoHealthboxObject(void *dest, u8 *windowTileData, u32 windowWidth)
+static void SafariTextIntoHealthboxObject(u8 *dest, const u8 *windowTileData, u32 windowWidth)
 {
     CpuCopy32(windowTileData, dest, windowWidth * TILE_SIZE_4BPP);
     CpuCopy32(windowTileData + 256, dest + 256, windowWidth * TILE_SIZE_4BPP);
