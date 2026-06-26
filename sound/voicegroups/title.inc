@@ -184,8 +184,8 @@ voice_group title
 	voice_directsound 60, 0, DirectSoundWaveData_sd90_special_scream_drive, 255, 0, 255, 195
 	@ 082: Calliope (Proxy: Unknown 1)
 	voice_directsound 60, 0, DirectSoundWaveData_unknown_1, 255, 204, 231, 127
-	@ 083: Chiff (Proxy: Unknown 2)
-	voice_directsound 60, 0, DirectSoundWaveData_unknown_2, 255, 204, 231, 127
+	@ 083: Chiff
+	voice_directsound 60, 0, DirectSoundWaveData_sc88pro_flute, 255, 204, 231, 127
 	@ 084: Charang (Proxy: Unknown 3)
 	voice_directsound 60, 0, DirectSoundWaveData_unknown_3, 255, 204, 231, 127
 	@ 085: Voice (Proxy: Choir Ahhs)
