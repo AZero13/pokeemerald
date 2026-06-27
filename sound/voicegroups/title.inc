@@ -83,7 +83,7 @@ voice_group title
 	@ 036: Slap Bass 1
 	voice_directsound 60, 0, DirectSoundWaveData_sc88pro_slap_bass, 255, 235, 128, 99
 	@ 037: Slap Bass 2 (Unison)
-	voice_directsound 60, 0, DirectSoundWaveData_sc88pro_slap_bass, 255, 230, 100, 99
+	voice_directsound 60, 0, DirectSoundWaveData_sc88pro_slap_bass, 255, 235, 128, 99
 	@ 038: Synth Bass 1
 	voice_directsound 60, 0, DirectSoundWaveData_sc88pro_synth_bass, 255, 255, 150, 80
 	@ 039: Synth Bass 2 (Mega Bass)
