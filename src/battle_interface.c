@@ -159,7 +159,7 @@ enum
 };
 
 static const u8 *GetHealthboxElementGfxPtr(u8);
-static u8 *AddTextPrinterAndCreateWindowOnHealthbox(const u8 *, s32, s32, u32, s32 *);
+static const u8 *AddTextPrinterAndCreateWindowOnHealthbox(const u8 *, s32, s32, u32, s32 *);
 
 static void RemoveWindowOnHealthbox(u32 windowId);
 static void UpdateHpTextInHealthboxInDoubles(u8, s16, u8);
@@ -1207,7 +1207,7 @@ void UpdateHpTextInHealthbox(u8 healthboxSpriteId, s16 value, u8 maxOrCurrent)
 static void UpdateHpTextInHealthboxInDoubles(u8 healthboxSpriteId, s16 value, u8 maxOrCurrent)
 {
     u32 windowId, spriteTileNum;
-    u8 *windowTileData;
+    const u8 *windowTileData;
     u8 text[32];
     void *objVram;
 
@@ -2126,7 +2126,7 @@ static u8 GetStatusIconForBattlerId(u8 statusElementId, u8 battler)
 static void UpdateSafariBallsTextOnHealthbox(u8 healthboxSpriteId)
 {
     u32 windowId, spriteTileNum;
-    u8 *windowTileData;
+    const u8 *windowTileData;
 
     windowTileData = AddTextPrinterAndCreateWindowOnHealthbox(gText_SafariBalls, 0, 3, 2, &windowId);
     spriteTileNum = gSprites[healthboxSpriteId].oam.tileNum * TILE_SIZE_4BPP;
@@ -2140,7 +2140,7 @@ static void UpdateLeftNoOfBallsTextOnHealthbox(u8 healthboxSpriteId)
     u8 text[16];
     u8 *txtPtr;
     u32 windowId, spriteTileNum;
-    u8 *windowTileData;
+    const u8 *windowTileData;
 
     txtPtr = StringCopy(text, gText_SafariBallLeft);
     ConvertIntToDecimalStringN(txtPtr, gNumSafariBalls, STR_CONV_MODE_LEFT_ALIGN, 2);
@@ -2541,7 +2541,7 @@ u8 GetHPBarLevel(s16 hp, s16 maxhp)
     return result;
 }
 
-static u8 *AddTextPrinterAndCreateWindowOnHealthbox(const u8 *str, s32 x, s32 y, u32 bgColor, s32 *windowId)
+static const u8 *AddTextPrinterAndCreateWindowOnHealthbox(const u8 *str, s32 x, s32 y, u32 bgColor, s32 *windowId)
 {
     s32 winId;
     u8 color[3];
@@ -2579,7 +2579,7 @@ static void TextIntoHealthboxObject(u8 *dest, const u8 *windowTileData, s32 wind
 {
     int i;
     CpuCopy32(windowTileData + 256, dest + 256, windowWidth * TILE_SIZE_4BPP);
-    // + 256 as that prevents the top 4 blank rows of sHealthboxWindowTemplate from being copied
+    // + 256 as that prevents the top 8 blank rows of sHealthboxWindowTemplate from being copied
     for (i = 0; i < windowWidth; i++)
     {
         CpuCopy32(windowTileData + 20, dest + 20, 12);
