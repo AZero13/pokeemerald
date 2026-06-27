@@ -767,7 +767,7 @@ static const struct WindowTemplate sHealthboxWindowTemplate = {
     .baseBlock = 0
 };
 
-static s32 DummiedOutFunction(s16 unused1, s16 unused2, s32 unused3)
+static s32 DummiedOutFunction(s16 unused1, s16 unused2, u16 *unused3)
 {
     return 9;
 }
@@ -2154,16 +2154,19 @@ static void UpdateLeftNoOfBallsTextOnHealthbox(u8 healthboxSpriteId)
 
 void UpdateHealthboxAttribute(u8 healthboxSpriteId, struct Pokemon *mon, u8 elementId)
 {
-    s32 maxHp, currHp;
+    s32 exp, currLevelExp;
+    u16 species;
+    u8 level;
     u8 battler = gSprites[healthboxSpriteId].hMain_Battler;
 
-    if (elementId == HEALTHBOX_ALL && !IsDoubleBattle())
-        GetBattlerSide(battler); // Pointless function call.
+    if (elementId == HEALTHBOX_ALL)
+    {
+        if (!IsDoubleBattle() && GetBattlerSide(battler)) // Pointless function calls
+            ;
+    }
 
     if (GetBattlerSide(gSprites[healthboxSpriteId].hMain_Battler) == B_SIDE_PLAYER)
     {
-        u8 isDoubles;
-
         if (elementId == HEALTHBOX_LEVEL || elementId == HEALTHBOX_ALL)
             UpdateLvlInHealthbox(healthboxSpriteId, GetMonData(mon, MON_DATA_LEVEL));
         if (elementId == HEALTHBOX_CURRENT_HP || elementId == HEALTHBOX_ALL)
@@ -2173,27 +2176,17 @@ void UpdateHealthboxAttribute(u8 healthboxSpriteId, struct Pokemon *mon, u8 elem
         if (elementId == HEALTHBOX_HEALTH_BAR || elementId == HEALTHBOX_ALL)
         {
             LoadBattleBarGfx(0);
-            maxHp = GetMonData(mon, MON_DATA_MAX_HP);
-            currHp = GetMonData(mon, MON_DATA_HP);
-            SetBattleBarStruct(battler, healthboxSpriteId, maxHp, currHp, 0);
+            SetBattleBarStruct(battler, healthboxSpriteId, GetMonData(mon, MON_DATA_MAX_HP), GetMonData(mon, MON_DATA_HP), 0);
             MoveBattleBar(battler, healthboxSpriteId, HEALTH_BAR, 0);
         }
-        isDoubles = IsDoubleBattle();
-        if (!isDoubles && (elementId == HEALTHBOX_EXP_BAR || elementId == HEALTHBOX_ALL))
+        if (!IsDoubleBattle() && (elementId == HEALTHBOX_EXP_BAR || elementId == HEALTHBOX_ALL))
         {
-            u16 species;
-            s32 exp, currLevelExp;
-            s32 currExpBarValue, maxExpBarValue;
-            u8 level;
-
             LoadBattleBarGfx(3);
             species = GetMonData(mon, MON_DATA_SPECIES);
             level = GetMonData(mon, MON_DATA_LEVEL);
-            exp = GetMonData(mon, MON_DATA_EXP);
-            currLevelExp = gExperienceTables[gSpeciesInfo[species].growthRate][level];
-            currExpBarValue = exp - currLevelExp;
-            maxExpBarValue = gExperienceTables[gSpeciesInfo[species].growthRate][level + 1] - currLevelExp;
-            SetBattleBarStruct(battler, healthboxSpriteId, maxExpBarValue, currExpBarValue, isDoubles);
+            currLevelExp = GetMonData(mon, MON_DATA_EXP) - gExperienceTables[gSpeciesInfo[species].growthRate][level];
+            exp = gExperienceTables[gSpeciesInfo[species].growthRate][level + 1] - gExperienceTables[gSpeciesInfo[species].growthRate][level];
+            SetBattleBarStruct(battler, healthboxSpriteId, exp, currLevelExp, 0);
             MoveBattleBar(battler, healthboxSpriteId, EXP_BAR, 0);
         }
         if (elementId == HEALTHBOX_NICK || elementId == HEALTHBOX_ALL)
@@ -2453,7 +2446,7 @@ static u8 CalcBarFilledPixels(s32 maxValue, s32 oldValue, s32 receivedValue, s32
 }
 
 // These two functions seem as if they were made for testing the health bar.
-static s16 UNUSED Debug_TestHealthBar(struct TestingBar *barInfo, s32 *currValue, u16 *dest, s32 unused)
+static s16 UNUSED Debug_TestHealthBar(struct TestingBar *barInfo, s32 *currValue, u16 *dest, u16 *unused)
 {
     s16 ret;
     u16 var;
