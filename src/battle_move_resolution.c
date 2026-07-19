@@ -1958,7 +1958,7 @@ static enum CancelerResult CancelerTargetFailure(struct BattleCalcValues *cv)
     enum MoveTarget moveTarget = GetBattlerMoveTargetType(cv->battlerAtk, cv->move);
     s32 movePriority = GetChosenMovePriority(cv->battlerAtk, cv->abilities[cv->battlerAtk]);
 
-    while (gBattleStruct->eventState.atkCancelerBattler < MAX_BATTLERS_COUNT)
+    while (gBattleStruct->eventState.atkCancelerBattler < gBattlersCount)
     {
         cv->battlerDef = GetTargetBySlot(cv->battlerAtk, gBattleStruct->eventState.atkCancelerBattler);
 
