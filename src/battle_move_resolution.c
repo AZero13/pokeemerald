@@ -2076,7 +2076,7 @@ static enum CancelerResult CancelerTargetFailure(struct BattleCalcValues *cv)
     switch (gBattleStruct->eventState.moveEndBlock)
     {
     case TARGET_FAILURE_SEMI_INVULNERABILITY:
-        for (enum BattlerId battler = B_BATTLER_0; battler < MAX_BATTLERS_COUNT; battler++)
+        for (enum BattlerId battler = B_BATTLER_0; battler < gBattlersCount; battler++)
         {
             cv->battlerDef = GetTargetBySlot(cv->battlerAtk, battler);
 
@@ -2098,7 +2098,7 @@ static enum CancelerResult CancelerTargetFailure(struct BattleCalcValues *cv)
         }
         gBattleStruct->eventState.moveEndBlock++;
     case TARGET_FAILURE_PSYCHIC_TERRAIN:
-        for (enum BattlerId battler = B_BATTLER_0; battler < MAX_BATTLERS_COUNT; battler++)
+        for (enum BattlerId battler = B_BATTLER_0; battler < gBattlersCount; battler++)
         {
             cv->battlerDef = ctx.battlerDef = GetTargetBySlot(cv->battlerAtk, battler);
 
@@ -2117,7 +2117,7 @@ static enum CancelerResult CancelerTargetFailure(struct BattleCalcValues *cv)
         }
         gBattleStruct->eventState.moveEndBlock++;
     case TARGET_FAILURE_PROTECT:
-        for (enum BattlerId battler = B_BATTLER_0; battler < MAX_BATTLERS_COUNT; battler++)
+        for (enum BattlerId battler = B_BATTLER_0; battler < gBattlersCount; battler++)
         {
             cv->battlerDef = GetTargetBySlot(cv->battlerAtk, battler);
 
@@ -2140,7 +2140,7 @@ static enum CancelerResult CancelerTargetFailure(struct BattleCalcValues *cv)
         }
         gBattleStruct->eventState.moveEndBlock++;
     case TARGET_FAILURE_BOUNCE:
-        for (enum BattlerId battler = B_BATTLER_0; battler < MAX_BATTLERS_COUNT; battler++)
+        for (enum BattlerId battler = B_BATTLER_0; battler < gBattlersCount; battler++)
         {
             cv->battlerDef = GetTargetBySlot(cv->battlerAtk, battler);
 
@@ -2164,7 +2164,7 @@ static enum CancelerResult CancelerTargetFailure(struct BattleCalcValues *cv)
         }
         gBattleStruct->eventState.moveEndBlock++;
     case TARGET_FAILURE_TARGET_BLOCKED:
-        for (enum BattlerId battler = B_BATTLER_0; battler < MAX_BATTLERS_COUNT; battler++)
+        for (enum BattlerId battler = B_BATTLER_0; battler < gBattlersCount; battler++)
         {
             cv->battlerDef = ctx.battlerDef = GetTargetBySlot(cv->battlerAtk, battler);
 
@@ -2183,7 +2183,7 @@ static enum CancelerResult CancelerTargetFailure(struct BattleCalcValues *cv)
         }
         gBattleStruct->eventState.moveEndBlock++;
     case TARGET_FAILURE_EFFECTIVENESS:
-        for (enum BattlerId battler = B_BATTLER_0; battler < MAX_BATTLERS_COUNT; battler++)
+        for (enum BattlerId battler = B_BATTLER_0; battler < gBattlersCount; battler++)
         {
             cv->battlerDef = ctx.battlerDef = GetTargetBySlot(cv->battlerAtk, battler);
 
@@ -2645,7 +2645,7 @@ static enum CancelerResult CancelerPreAnimActivations(struct BattleCalcValues *c
         }
         gBattleStruct->eventState.moveEndBlock++;
     case PRE_ANIM_TERA_SHELL:
-        for (enum BattlerId battler = B_BATTLER_0; battler < MAX_BATTLERS_COUNT; battler++)
+        for (enum BattlerId battler = B_BATTLER_0; battler < gBattlersCount; battler++)
         {
             enum BattlerId battlerDef = GetTargetBySlot(cv->battlerAtk, battler);
 
