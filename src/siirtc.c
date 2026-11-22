@@ -64,13 +64,18 @@
 #define GPIO_PORT_DIRECTION   (*(vu16 *)0x80000C6)
 #define GPIO_PORT_READ_ENABLE (*(vu16 *)0x80000C8)
 
-extern vu16 GPIOPortDirection;
 
 static u16 sDummy; // unused variable
 static bool8 sLocked;
 
-static int WriteCommand(u8 value);
-static int WriteData(u8 value);
+// Nintendo later made these void, as the return value was never set.
+#ifdef UBFIX
+static void WriteCommand(u8 value);
+static void WriteData(u8 value);
+#else
+static u8 WriteCommand(u8 value);
+static u8 WriteData(u8 value);
+#endif
 static u8 ReadData();
 
 static void EnableGpioPortRead();
@@ -369,7 +374,7 @@ static bool8 UNUSED SiiRtcSetAlarm(struct SiiRtcInfo *rtc)
     GPIO_PORT_DATA = SCK_HI;
     GPIO_PORT_DATA = SCK_HI | CS_HI;
 
-    GPIOPortDirection = DIR_ALL_OUT; // Why is this the only instance that uses a symbol?
+    GPIO_PORT_DIRECTION = DIR_ALL_OUT;
 
     WriteCommand(CMD_ALARM | WR);
 
@@ -384,7 +389,11 @@ static bool8 UNUSED SiiRtcSetAlarm(struct SiiRtcInfo *rtc)
     return TRUE;
 }
 
-static int WriteCommand(u8 value)
+#ifdef UBFIX
+static void WriteCommand(u8 value)
+#else
+static u8 WriteCommand(u8 value)
+#endif
 {
     u8 i;
     u8 temp;
@@ -397,15 +406,13 @@ static int WriteCommand(u8 value)
         GPIO_PORT_DATA = (temp << 1) | CS_HI;
         GPIO_PORT_DATA = (temp << 1) | SCK_HI | CS_HI;
     }
-
-    // Nothing uses the returned value from this function,
-    // so the undefined behavior is harmless in the vanilla game.
-#ifdef UBFIX
-    return 0;
-#endif
 }
 
-static int WriteData(u8 value)
+#ifdef UBFIX
+static void WriteData(u8 value)
+#else
+static u8 WriteData(u8 value)
+#endif
 {
     u8 i;
     u8 temp;
@@ -418,22 +425,16 @@ static int WriteData(u8 value)
         GPIO_PORT_DATA = (temp << 1) | CS_HI;
         GPIO_PORT_DATA = (temp << 1) | SCK_HI | CS_HI;
     }
-
-    // Nothing uses the returned value from this function,
-    // so the undefined behavior is harmless in the vanilla game.
-#ifdef UBFIX
-    return 0;
-#endif
 }
 
 static u8 ReadData()
 {
     u8 i;
     u8 temp;
-    u8 value;
-
 #ifdef UBFIX
-    value = 0;
+    u8 value = 0;
+#else
+    u8 value; // Nintendo later initialized this to 0
 #endif
 
     for (i = 0; i < 8; i++)
@@ -461,3 +462,6 @@ static void DisableGpioPortRead()
 {
     GPIO_PORT_READ_ENABLE = FALSE;
 }
+
+// Unused. Nintendo defines this pointer with the GPIO helpers, after the RTC code.
+static vu16 *const sGpioPortDirection = &GPIO_PORT_DIRECTION;

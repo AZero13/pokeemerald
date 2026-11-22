@@ -193,7 +193,7 @@ void rfu_LMAN_initializeRFU(INIT_PARAM *init_parameters);
 u8 rfu_LMAN_establishConnection(u8 parent_child, u16 connect_period, u16 name_accept_period, u16 *acceptable_serialNo_list);
 void rfu_LMAN_stopManager(u8 forced_stop_and_RFU_reset_flag);
 void rfu_LMAN_setMSCCallback(void (*MSC_callback_p)(u16));
-void rfu_LMAN_REQ_sendData(bool8 clockChangeFlag);
+void rfu_LMAN_REQ_sendData(u8 clockChangeFlag);
 void rfu_LMAN_powerDownRFU(void);
 u8 rfu_LMAN_CHILD_connectParent(u16 parentId, u16 connect_period);
 u8 rfu_LMAN_setLinkRecovery(u8 enable_flag, u16 recovery_period);
@@ -201,5 +201,9 @@ void rfu_LMAN_manager_entity(u32 rand);
 void rfu_LMAN_syncVBlank(void);
 u8 rfu_LMAN_initializeManager(void (*LMAN_callback_p)(u8, u8), void (*MSC_callback_p)(u16));
 void rfu_LMAN_forceChangeSP(void);
+void rfu_LMAN_setLMANCallback(void (*LMAN_callback_p)(u8, u8));
+u8 rfu_LMAN_setNIFailCounterLimit(u16 NI_failCounter_limit);
+u8 rfu_LMAN_setFastSearchParent(u8 enable_flag);
+void rfu_LMAN_PARENT_stopWaitLinkRecoveryAndDisconnect(u8 bm_targetSlot);
 
 #endif //GUARD_LINKMANAGER_H

@@ -13,51 +13,51 @@ static const struct FlashSetupInfo *const sSetupInfos[] =
 u16 IdentifyFlash(void)
 {
     u16 result;
-    u16 flashId;
-    const struct FlashSetupInfo *const *setupInfo;
+    u16 flashID;
+    const struct FlashSetupInfo *const *flp;
 
     REG_WAITCNT = (REG_WAITCNT & ~WAITCNT_SRAM_MASK) | WAITCNT_SRAM_8;
 
-    flashId = ReadFlashId();
+    flashID = ReadFlashId();
 
-    setupInfo = sSetupInfos;
+    flp = sSetupInfos;
     result = 1;
 
     for (;;)
     {
-        if ((*setupInfo)->type.ids.separate.makerId == 0)
+        if ((*flp)->type.ids.separate.makerId == 0)
             break;
 
-        if (flashId == (*setupInfo)->type.ids.joined)
+        if (flashID == (*flp)->type.ids.joined)
         {
             result = 0;
             break;
         }
 
-        setupInfo++;
+        flp++;
     }
 
-    ProgramFlashByte = (*setupInfo)->programFlashByte;
-    ProgramFlashSector = (*setupInfo)->programFlashSector;
-    EraseFlashChip = (*setupInfo)->eraseFlashChip;
-    EraseFlashSector = (*setupInfo)->eraseFlashSector;
-    WaitForFlashWrite = (*setupInfo)->WaitForFlashWrite;
-    gFlashMaxTime = (*setupInfo)->maxTime;
-    gFlash = &(*setupInfo)->type;
+    ProgramFlashByte = (*flp)->programFlashByte;
+    ProgramFlashSector = (*flp)->programFlashSector;
+    EraseFlashChip = (*flp)->eraseFlashChip;
+    EraseFlashSector = (*flp)->eraseFlashSector;
+    WaitForFlashWrite = (*flp)->WaitForFlashWrite;
+    gFlashMaxTime = (*flp)->maxTime;
+    gFlash = &(*flp)->type;
 
     return result;
 }
 
 u16 WaitForFlashWrite_Common(u8 phase, u8 *addr, u8 lastData)
 {
+    u8 poll;
     u16 result = 0;
-    u8 status;
 
     StartFlashTimer(phase);
 
-    while ((status = PollFlashStatus(addr)) != lastData)
+    while ((poll = PollFlashStatus(addr)) != lastData)
     {
-        if (status & 0x20)
+        if (poll & 0x20)
         {
             // The write operation exceeded the flash chip's time limit.
 
